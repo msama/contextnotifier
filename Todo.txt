@@ -1,0 +1,7 @@
+Rules activation not only with time but using handlers
+
+Others rules or activity as a notification.
+
+OPENFILE
+
+

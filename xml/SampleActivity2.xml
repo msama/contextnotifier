@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:Activity 
+	xmlns:tns="http://www.ucl.cs.ac.uk/ContextNotifier/ActivitySchema" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.ucl.cs.ac.uk/ContextNotifier/ActivitySchema ActivitySchema.xsd "
+	Name="Sample2" 
+	Description="This sample loads a TimeHandler." 
+	Date="0"
+	Sample="true">
+  <tns:Rule Name="Sample2_Rule0" OccurrenceMsec="0">
+    <tns:NotificationTree>
+    	<tns:ConstraintNode Handler="TimeHandler" Type="Greater" Value="100000000" Redifined="false"/>
+    </tns:NotificationTree>
+    <tns:ActivationTree>
+    	<tns:ConstraintNode Handler="TimeHandler" Type="Greater" Value="20000" Redifined="false"/>
+    </tns:ActivationTree>
+    <tns:Notification RemoveActivity="true" RemoveRule="false" Notifier="VibrationNotifier">
+    	<tns:Param Name="Message" Value="TimeSample"/>
+    </tns:Notification>
+  </tns:Rule>
+</tns:Activity>

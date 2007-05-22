@@ -1,0 +1,13 @@
+XmlRootFolder: file://localhost///Memory card/ContextNotifier/
+MIDlet-Jar-Size: 119076
+MIDlet-1: ContextNotifier,resources/peripheral.jpeg,ucl.cs.contextNotifier.ContextNotifierMIDlet
+BT_NAME: Blackhole
+MIDlet-Jar-URL: ContextNotifier.jar
+MIDlet-Icon: /resources/peripheral.jpeg
+MicroEdition-Configuration: CLDC-1.1
+MIDlet-Version: 0.1.2
+MIDlet-Description: ContextNotifier midlet suit
+MIDlet-Name: ContextNotifier
+MIDlet-Vendor: Michele Sama
+MicroEdition-Profile: MIDP-2.0
+MIDlet-Permissions: javax.microedition.io.PushRegistry,javax.microedition.pim.ContactList.read,javax.microedition.pim.ContactList.write,javax.microedition.pim.EventList.read,javax.microedition.pim.ToDoList.read,javax.microedition.io.Connector.file.read

@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ContextNotifier" default="jar" basedir=".">
+    <property name="src" location="src"/>
+    <property name="bin" location="bin"/>
+	<!--<property name="classes" location="classes"/>-->
+	<property name="preverified" location="preverified" />
+    <property name="lib" location="lib"/>
+    <property name="dist" location="dist"/>
+	<property name="j2meFakeRoot" location="/Users/rax/Documents/j2meFakeRoot"/>
+	<property name="demoFakeRoot" location="/Users/rax/Documents/demoFakeRoots"/>
+	<property name="xml" location="xml"/>
+	<property name="signed" location="signed"/>
+	<property name="resources" location="resources"/>
+    <property name="jarfile" location="${dist}/${ant.project.name}.jar"/>
+	<property name="jadfile" location="${dist}/${ant.project.name}.jad"/>
+	<property name="signedjarfile" location="${signed}/${ant.project.name}.jar"/>
+    <property name="compile.debug" value="true"/>
+	<property name="manifest" location="Manifest"/>
+	
+	
+	
+  	<!-- Edit the "mpp" property with the path to your installed mpp-sdk. -->
+  	<property name="mpp" value="/Users/rax/Documents/mpp-sdk"/>
+	<!--<property name="cldc1.1" location="${mpp}/midp2/cldcapi11.jar"/>-->
+	<property name="cldc1.1" location="/Library/Java/Extensions/WTK2.2/lib/cldcapi11.jar"/>
+	<!--<property name="midp2.0" location="${mpp}/midp2/midpapi20.jar"/>-->
+	<property name="midp2.0" location="/Library/Java/Extensions/WTK2.2/lib/midpapi20.jar"/>
+	<property name="jsr082" location="/Library/Java/Extensions/WTK2.2/lib/jsr082.jar"/>
+	<property name="jsr75" location="/Library/Java/Extensions/WTK2.2/lib/jsr75.jar"/>
+	<property name="jsr179" location="${lib}/lapi.jar"/>
+	<property name="kXml2" location="${lib}/kxml2-2.3.0/"/>
+	
+	<property name="TestingEmulator" value="/Users/rax/APPZ/TestingEmulator/TestingEmulator/dist/TestingEmulator.jar" />
+
+  	<!-- The "preverify" target requires the bootstrap classes. (This is where they live on Mac OS X.) -->
+  	<property name="java.classes.jar" value="/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Classes/" />
+
+    <fileset id="lib.jars" dir="${lib}">
+        <include name="**/*.jar"/>
+    </fileset>
+
+    <path id="lib.path">
+    	<!--<pathelement location="${j2meunit}"/>-->
+    	<pathelement path="${src}/"/>
+    </path>
+	
+    <target name="clean" description="Remove build and dist directories">
+        <delete dir="${bin}"/>
+        <delete dir="${dist}"/>
+    	<delete dir="${signed}"/>
+		<!--<delete dir="${classes}" />-->
+		<delete dir="${preverified}" />
+    </target>
+
+    <target name="compile" description="Compile code">
+        <mkdir dir="${lib}"/>
+		<mkdir dir="${bin}"/>
+        <javac srcdir="${src}" destdir="${bin}" includeAntRuntime="no" classpathref="lib.path" classpath="${cldc1.1}:${midp2.0}:${jsr082}:${jsr75}:${jsr179}:${kXml2}" debug="${compile.debug}" source="1.3" target="1.3">
+        </javac>
+    </target>
+	
+	  <!-- The preverify target is set up for Mac OS X -->
+	  <target name="preverify" depends="compile">
+		<mkdir dir="${preverified}"/>
+	  	<exec executable="${mpp}/osx/preverify/preverify">
+	  		  			  <arg line="-classpath ${cldc1.1}:${midp2.0}:${java.classes.jar}"/>	
+	  		  			  <arg line="-d ${preverified}"/>
+	  		  			  <arg line="${kXml2}"/>
+	  		  			</exec>
+		<exec executable="${mpp}/osx/preverify/preverify">
+		  <arg line="-classpath ${cldc1.1}:${midp2.0}:${jsr082}:${jsr75}:${jsr179}:${kXml2}:${java.classes.jar}"/>	
+		  <arg line="-d ${preverified}"/>
+		  <arg line="${bin}"/>
+		</exec>
+	  	
+	  </target>
+	
+    <target name="jar" depends="preverify" description="Build jar">
+        <mkdir dir="${dist}"/>
+    	<copydir src="${xml}" dest="${j2meFakeRoot}/${ant.project.name}/" />
+    	<!-- demo BEGIN -->
+    	<copy file="${xml}/Meeting.xml" tofile="${demoFakeRoot}/meeting/${ant.project.name}/Meeting.xml" />
+    	<copy file="${xml}/ActivitySchema.xsd" tofile="${demoFakeRoot}/meeting/${ant.project.name}/ActivitySchema.xsd" />
+    	
+    	<copy file="${xml}/SampleActivity0.xml" tofile="${demoFakeRoot}/notification/${ant.project.name}/SampleActivity0.xml" />
+    	<copy file="${xml}/ActivitySchema.xsd" tofile="${demoFakeRoot}/notification/${ant.project.name}/ActivitySchema.xsd" />
+    	
+    	<copy file="${xml}/SampleActivity2.xml" tofile="${demoFakeRoot}/time/${ant.project.name}/SampleActivity2.xml" />
+    	<copy file="${xml}/ActivitySchema.xsd" tofile="${demoFakeRoot}/time/${ant.project.name}/ActivitySchema.xsd" />
+    	
+    	<copy file="${xml}/SampleActivity1.xml" tofile="${demoFakeRoot}/gc/${ant.project.name}/SampleActivity1.xml" />
+    	<copy file="${xml}/ActivitySchema.xsd" tofile="${demoFakeRoot}/gc/${ant.project.name}/ActivitySchema.xsd" />
+    	<!-- demo END -->
+    	<copy file="${ant.project.name}.jad" tofile="${manifest}" />
+    	<copy file="${ant.project.name}.jad" tofile="${jadfile}" />
+        <jar jarfile="${jarfile}" basedir="${preverified}" manifest="${manifest}">
+            <!-- Merge library jars into final jar file -->
+            <!--<zipgroupfileset refid="lib.jars"/>-->
+            <fileset dir="${resources}" />
+        </jar>
+    </target>
+	
+	<target name="sign" depends="jar" description="Sign jar file">
+		<mkdir dir="${signed}"/>
+	    <signjar
+	        alias="AdaptiveReminder"
+	        storepass="keystorepwd"
+	        jar="${jarfile}" signedjar="${signedjarfile}"/>
+		</target>
+
+    <target name="run" depends="jar" description="Run jar file">
+        <java jar="${TestingEmulator}" fork="yes" failonerror="true" classpath="${cldc1.1}:${midp2.0}:${jsr082}:${jsr75}:${jsr179}">
+		 	<arg value="${jadfile}"/>
+		</java>
+    </target>
+	
+    <target name="debug" depends="jar" description="Debug application on the emulator">
+    	<exec executable="java">
+    		<arg value="-Xdebug"/>
+    		<arg value="-Xnoagent"/>
+    		<arg value="-Djava.compiler=NONE"/>
+    		<arg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000"/>
+    	    <arg value="-jar ${TestingEmulator}"/>
+    		<arg value="${jarfile}"/>
+    	</exec>
+    
+        <!--<java jar="${TestingEmulator}" fork="yes" failonerror="true">
+		 	<arg value="-Xdebug"/>
+        	<arg value="-Xnoagent"/>
+		 	<arg value="-Djava.compiler=NONE"/>
+        	<arg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000"/>
+        	<arg value="${jadfile}"/>
+		</java>-->
+		
+    </target>
+	
+	<target name="createCert"  description="Creates certificate with keytool">
+	    	<exec executable="keytool">
+	    		<arg value="-genkey"/>
+	    		<arg value="-alias ContextNotifier"/>
+	    		<arg value="-keyalg RSA"/>
+	    		<arg value="-dname 'CN=Michele Sama, OU=CS, O=UCL, L=London, ST=UK, C=UK';"/>
+	    		<arg value="-validity 3650"/>
+	    		<arg value="-keypass keystorepwd"/>
+	    		<arg value="-storepass keystorepwd"/>
+	    	</exec>
+	  </target>
+	    		
+	    		
+	    		
+	 <target name="exportCert"  description="exports a certificate with keytool">
+	    	<exec executable="keytool">
+	    		<arg value="-export"/>
+	    		<arg value="-alias AdaptiveReminder"/>
+	    		<arg value="-file MyCertificate.cer"/>
+	    		<arg value="-storepass keystorepwd"/>
+	    		<arg value="-keypass keystorepwd"/>
+	    	</exec>
+	  </target>
+	
+	
+	<target name="deploy" depends="jar">
+		<exec executable="${basedir}/btsend.sh">
+	   		<arg line="${jarfile}"/>
+		</exec>
+	</target>
+	
+    <target name="parallels" depends="jar" description="Copy jar and jad file into the right directory">
+		<copy file="${dist}/${ant.project.name}.jad" tofile="/Users/Rax/ParallelsShared/${ant.project.name}.jad" />
+    	<copy file="${dist}/${ant.project.name}.jar" tofile="/Users/Rax/ParallelsShared/${ant.project.name}.jar" />
+    </target>
+</project>

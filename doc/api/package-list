@@ -1,0 +1,13 @@
+j2meunit.examples
+j2meunit.examples.midp
+j2meunit.framework
+j2meunit.midletui
+j2meunit.textui
+j2meunit.util
+org.kxml
+org.kxml.io
+org.kxml.kdom
+org.kxml.parser
+org.kxml.wap
+ucl.cs.adaptiveReminder
+ucl.cs.adaptiveReminder.failures

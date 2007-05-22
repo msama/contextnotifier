@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.ucl.cs.ac.uk/ContextNotifier/ActivitySchema" xmlns:tns="http://www.ucl.cs.ac.uk/ContextNotifier/ActivitySchema" elementFormDefault="qualified">
+
+    <complexType name="ConstraintNode">
+    	<sequence>
+    		<element name="Param" type="tns:Param"
+    			maxOccurs="unbounded" minOccurs="0">
+    		</element>
+    	</sequence>
+    	<attribute name="Value" type="string" use="required"></attribute>
+    	<attribute name="Type" type="string" use="required"></attribute>
+    	<attribute name="Handler" type="string" use="required"></attribute>
+    	<attribute name="Redifined" type="boolean"></attribute>
+    </complexType>
+
+
+    <complexType name="OrConstraintNode">
+    	<sequence maxOccurs="unbounded" minOccurs="2">
+    		<choice minOccurs="1" maxOccurs="1">
+    			<element name="ConstraintNode"
+    				type="tns:ConstraintNode">
+    			</element>
+    			<element name="OrConstraintNode" type="tns:OrConstraintNode"></element>
+    			<element name="AndConstraintNode" type="tns:AndConstraintNode"></element>
+    			<element name="NotConstraintNode" type="tns:NotConstraintNode"></element>
+    		</choice>
+    	</sequence>
+    </complexType>
+
+    <complexType name="AndConstraintNode">
+    	<sequence maxOccurs="unbounded" minOccurs="2">
+    		<choice minOccurs="1" maxOccurs="1">
+    			<element name="ConstraintNode"
+    				type="tns:ConstraintNode">
+    			</element>
+    			<element name="OrConstraintNode" type="tns:OrConstraintNode"></element>
+    			<element name="AndConstraintNode" type="tns:AndConstraintNode"></element>
+    			<element name="NotConstraintNode" type="tns:NotConstraintNode"></element>
+    		</choice>
+    	</sequence>
+    </complexType>
+
+    <complexType name="Rule">
+    	<sequence>
+    		<element name="NotificationTree" type="tns:ConstraintTree"
+    			minOccurs="1" maxOccurs="1">
+    		</element>
+    		<element name="ActivationTree" type="tns:ConstraintTree"
+    			minOccurs="0" maxOccurs="1">
+    		</element>
+    		<element name="DeactivationTree" type="tns:ConstraintTree"
+    			minOccurs="0" maxOccurs="1">
+    		</element>
+    		<element name="Notification" type="tns:Notification" minOccurs="1" maxOccurs="1"></element>
+    	</sequence>
+    	<attribute name="Name" type="string" use="required"></attribute>
+    	<attribute name="OccurrenceMsec" type="int" use="required"></attribute>
+    </complexType>
+
+    <complexType name="Activity">
+    	<sequence maxOccurs="unbounded" minOccurs="0">
+    		<element name="Rule" type="tns:Rule"></element>
+    	</sequence>
+    	<attribute name="Name" type="string"></attribute>
+    	<attribute name="Description" type="string"></attribute>
+    	<attribute name="Date" type="int"></attribute>
+    	<attribute name="Sample" type="boolean" use="optional"></attribute>
+    </complexType>
+
+    <element name="Activity" type="tns:Activity"></element>
+
+    <complexType name="Notification">
+    	<sequence minOccurs="0" maxOccurs="unbounded">
+    		<element name="Param" type="tns:Param"></element>
+    	</sequence>
+    	<attribute name="Notifier" type="string" use="required"></attribute>
+    	<attribute name="RemoveActivity" type="boolean"
+    		use="required">
+    	</attribute>
+    	<attribute name="RemoveRule" type="boolean" use="required"></attribute>
+    </complexType>
+
+    <complexType name="Param">
+    	<attribute name="Name" type="string" use="required"></attribute>
+    	<attribute name="Value" type="string" use="required"></attribute>
+    </complexType>
+
+    <complexType name="NotConstraintNode">
+    	<choice minOccurs="1" maxOccurs="1">
+    			<element name="ConstraintNode"
+    				type="tns:ConstraintNode">
+    			</element>
+    			<element name="OrConstraintNode" type="tns:OrConstraintNode"></element>
+    			<element name="AndConstraintNode" type="tns:AndConstraintNode"></element>
+    			<element name="NotConstraintNode" type="tns:NotConstraintNode"></element>
+    		</choice>
+    </complexType>
+
+    <complexType name="ConstraintTree">
+    		<choice minOccurs="1" maxOccurs="1">
+    			<element name="ConstraintNode"
+    				type="tns:ConstraintNode">
+    			</element>
+    			<element name="AndConstraintNode"
+    				type="tns:AndConstraintNode">
+    			</element>
+    			<element name="OrConstraintNode"
+    				type="tns:OrConstraintNode">
+    			</element>
+    			<element name="NotConstraintNode"
+    				type="tns:NotConstraintNode">
+    			</element>
+    		</choice>
+    </complexType>
+</schema>
