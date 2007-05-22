@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:Activity Date="0"
+	Description="A really important meeting that you should attend in Boss office."
+	Name="Meeting" Sample="true"
+	xmlns:tns="http://www.ucl.cs.ac.uk/ContextNotifier/ActivitySchema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.ucl.cs.ac.uk/ContextNotifier/ActivitySchema ActivitySchema.xsd ">
+	<tns:Rule Name="Long term Reminder" OccurrenceMsec="150000">
+		<tns:NotificationTree>
+			<tns:NotConstraintNode>
+				<tns:OrConstraintNode>
+					<tns:OrConstraintNode>
+						<tns:ConstraintNode Handler="BlueToothFinder"
+							Type="Equals" Value="MyBossComputer" Redifined="false" />
+						<tns:ConstraintNode Handler="GPSLocation"
+							Type="Lesser" Value="MyBossOffice" Redifined="true">
+							<tns:Param Name="Latitude"
+								Value="51:31:23.75" />
+							<tns:Param Name="Longitude"
+								Value="7:56.99" />
+							<tns:Param Name="Altitude" Value="20" />
+							<tns:Param Name="Radius" Value="50" />
+						</tns:ConstraintNode>
+					</tns:OrConstraintNode>
+					<tns:ConstraintNode Handler="BlueToothFinder"
+						Type="Equals" Value="MyBossMobile" Redifined="false" />
+					<tns:AndConstraintNode>
+						<tns:ConstraintNode Handler="GPSLocation"
+							Type="Lesser" Value="MyOffice" Redifined="true">
+							<tns:Param Name="Latitude"
+								Value="51:31:23.75" />
+							<tns:Param Name="Longitude"
+								Value="7:56.99" />
+							<tns:Param Name="Altitude" Value="20" />
+							<tns:Param Name="Radius" Value="50" />
+						</tns:ConstraintNode>
+						<tns:ConstraintNode Handler="BlueToothFinder"
+							Type="Equals" Value="MyComputer" Redifined="false" />
+					</tns:AndConstraintNode>
+				</tns:OrConstraintNode>
+			</tns:NotConstraintNode>
+		</tns:NotificationTree>
+		<tns:ActivationTree>
+			<tns:OrConstraintNode>
+				<tns:ConstraintNode Handler="GPSLocation" Type="Greater"
+					Value="MyBossOffice" Redifined="true">
+					<tns:Param Name="Latitude" Value="51:31:23.75" />
+					<tns:Param Name="Longitude" Value="7:56.99" />
+					<tns:Param Name="Altitude" Value="20" />
+					<tns:Param Name="Radius" Value="5000" />
+				</tns:ConstraintNode>
+				<tns:AndConstraintNode>
+					<tns:ConstraintNode Value="3600000" Type="Greater"
+						Handler="TimeHandler">
+					</tns:ConstraintNode>
+					<tns:ConstraintNode Handler="GPSLocation"
+						Type="Greater" Value="MyBossOffice" Redifined="true">
+						<tns:Param Name="Latitude" Value="51:31:23.75" />
+						<tns:Param Name="Longitude" Value="7:56.99" />
+						<tns:Param Name="Altitude" Value="20" />
+						<tns:Param Name="Radius" Value="2500" />
+					</tns:ConstraintNode>
+				</tns:AndConstraintNode>
+				<tns:ConstraintNode Value="6900000" Type="Greater"
+					Handler="TimeHandler">
+				</tns:ConstraintNode>
+			</tns:OrConstraintNode>
+		</tns:ActivationTree>
+		<tns:DeactivationTree>
+			<tns:ConstraintNode Value="8700000" Type="Greater"
+				Handler="TimeHandler">
+			</tns:ConstraintNode>
+		</tns:DeactivationTree>
+		<tns:Notification RemoveActivity="false" RemoveRule="false"
+			Notifier="RingtoneNotifier">
+			<tns:Param Name="Message"
+				Value="You seam to be really far from the meeting place. Try to go closer to the the place in wich the meeting will occur." />
+		</tns:Notification>
+	</tns:Rule>
+	<tns:Rule Name="5' Reminder" OccurrenceMsec="0">
+		<tns:NotificationTree>
+			<tns:NotConstraintNode>
+				<tns:OrConstraintNode>
+					<tns:AndConstraintNode>
+						<tns:ConstraintNode Handler="BlueToothFinder"
+							Type="Equals" Value="MyBossComputer" Redifined="false" />
+						<tns:ConstraintNode Handler="GPSLocation"
+							Type="Lesser" Value="MyBossOffice" Redifined="true">
+							<tns:Param Name="Latitude"
+								Value="51:31:23.75" />
+							<tns:Param Name="Longitude"
+								Value="7:56.99" />
+							<tns:Param Name="Altitude" Value="20" />
+							<tns:Param Name="Radius" Value="50" />
+						</tns:ConstraintNode>
+					</tns:AndConstraintNode>
+					<tns:ConstraintNode Handler="BlueToothFinder"
+						Type="Equals" Value="MyBossMobile" Redifined="false" />
+				</tns:OrConstraintNode>
+			</tns:NotConstraintNode>
+
+		</tns:NotificationTree>
+		<tns:ActivationTree>
+			<tns:ConstraintNode Value="8700000" Type="Greater"
+				Handler="TimeHandler">
+			</tns:ConstraintNode>
+		</tns:ActivationTree>
+		<tns:DeactivationTree>
+			<tns:ConstraintNode Value="0" Type="Greater"
+				Handler="TimeHandler">
+			</tns:ConstraintNode>
+		</tns:DeactivationTree>
+		<tns:Notification RemoveActivity="true" RemoveRule="false"
+			Notifier="VibrationNotifier">
+			<tns:Param Name="Message"
+				Value="The meeting will start in 5 minutes. Pack your staff and go to the meeting place." />
+		</tns:Notification>
+	</tns:Rule>
+	<tns:Rule Name="Presentation File" OccurrenceMsec="300000">
+		<tns:NotificationTree>
+			<tns:ConstraintNode Value="file://E:/Presentation.ppt"
+				Type="NotEquals" Handler="FileSystemHandler" Redifined="false">
+			</tns:ConstraintNode>
+		</tns:NotificationTree>
+		<tns:Notification RemoveActivity="false" RemoveRule="false"
+			Notifier="RingtoneNotifier">
+			<tns:Param Name="Message"
+				Value="The presentation file is missing. Be sure that u have it with u." />
+		</tns:Notification>
+	</tns:Rule>
+</tns:Activity>

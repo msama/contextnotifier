@@ -1,0 +1,1 @@
+if GPSLocation fail to start an unhandled exception is raised.

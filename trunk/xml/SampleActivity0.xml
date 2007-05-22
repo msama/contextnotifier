@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:Activity
+	xmlns:tns="http://www.ucl.cs.ac.uk/ContextNotifier/ActivitySchema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.ucl.cs.ac.uk/ContextNotifier/ActivitySchema ActivitySchema.xsd "
+	Name="Sample0"
+	Description="Start a vibration when specific BT devices are in the area."
+	Date="0" Sample="true">
+	<tns:Rule Name="BT_Blackhole" OccurrenceMsec="10000">
+		<tns:NotificationTree>
+			<tns:ConstraintNode Handler="BlueToothFinder" Type="Equals"
+				Value="Blackhole" Redifined="false" />
+		</tns:NotificationTree>
+		<tns:Notification RemoveActivity="true" RemoveRule="false" Notifier="VibrationNotifier">
+			<tns:Param Name="Message" Value="Found BlackHole"/>
+		</tns:Notification>
+	</tns:Rule>
+	<tns:Rule Name="BT_MyComputer" OccurrenceMsec="10000">
+		<tns:NotificationTree>
+			<tns:ConstraintNode Handler="BlueToothFinder" Type="Equals"
+				Value="MyComputer" Redifined="false" />
+		</tns:NotificationTree>
+		<tns:Notification RemoveActivity="false" RemoveRule="false" Notifier="VibrationNotifier">
+			<tns:Param Name="Message" Value="Found MyComputer"/>
+		</tns:Notification>
+	</tns:Rule>
+</tns:Activity>

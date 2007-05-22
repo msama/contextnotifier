@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:Activity 
+	xmlns:tns="http://www.ucl.cs.ac.uk/ContextNotifier/ActivitySchema" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.ucl.cs.ac.uk/ContextNotifier/ActivitySchema ActivitySchema.xsd "
+	Name="Sample1" 
+	Description="This sample loads ContextHandlers and dispose them in order to see if they are garbagecollected properly." 
+	Date="0"
+	Sample="true">
+  <tns:Rule Name="Sample1_Rule0" OccurrenceMsec="0">
+    <tns:NotificationTree>
+    	<tns:OrConstraintNode>
+    	<tns:ConstraintNode Handler="BlueToothFinder" Type="NotEquals" Value="BT" Redifined="false"/>
+    	<tns:ConstraintNode Handler="TimeHandler" Type="Lesser" Value="0" Redifined="false"/>
+    	<tns:ConstraintNode Handler="GPSLocation" Type="NotEquals" Value="AnyPlace" Redifined="false"/>
+    </tns:OrConstraintNode>
+    </tns:NotificationTree>
+    <tns:ActivationTree>
+    	<tns:ConstraintNode Value="10000" Type="Greater" Handler="TimeHandler"></tns:ConstraintNode>
+    </tns:ActivationTree>
+    <tns:DeactivationTree>
+    	<tns:ConstraintNode Value="50000" Type="Greater" Handler="TimeHandler"></tns:ConstraintNode>	
+    </tns:DeactivationTree>
+    <tns:Notification RemoveActivity="true" RemoveRule="false" Notifier="VibrationNotifier">
+    <tns:Param Name="Message" Value="All the handler will be disposed."/>
+    </tns:Notification>
+  </tns:Rule>
+</tns:Activity>
