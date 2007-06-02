@@ -29,6 +29,7 @@
 	<property name="jsr75" location="/Library/Java/Extensions/WTK2.2/lib/jsr75.jar"/>
 	<property name="jsr179" location="${lib}/lapi.jar"/>
 	<property name="kXml2" location="${lib}/kxml2-2.3.0/"/>
+	<property name="oracles" location="oracles"/>
 	
 	<property name="TestingEmulator" value="/Users/rax/APPZ/TestingEmulator/TestingEmulator/dist/TestingEmulator.jar" />
 
@@ -55,7 +56,7 @@
     <target name="compile" description="Compile code">
         <mkdir dir="${lib}"/>
 		<mkdir dir="${bin}"/>
-        <javac srcdir="${src}" destdir="${bin}" includeAntRuntime="no" classpathref="lib.path" classpath="${cldc1.1}:${midp2.0}:${jsr082}:${jsr75}:${jsr179}:${kXml2}" debug="${compile.debug}" source="1.3" target="1.3">
+        <javac srcdir="${src}" destdir="${bin}" includeAntRuntime="no" classpathref="lib.path" classpath="${cldc1.1}:${midp2.0}:${jsr082}:${jsr75}:${jsr179}:${kXml2}:${oracles}" debug="${compile.debug}" source="1.3" target="1.3">
         </javac>
     </target>
 	
@@ -66,9 +67,10 @@
 	  		  			  <arg line="-classpath ${cldc1.1}:${midp2.0}:${java.classes.jar}"/>	
 	  		  			  <arg line="-d ${preverified}"/>
 	  		  			  <arg line="${kXml2}"/>
+	  					  <arg line="${oracles}"/>
 	  		  			</exec>
 		<exec executable="${mpp}/osx/preverify/preverify">
-		  <arg line="-classpath ${cldc1.1}:${midp2.0}:${jsr082}:${jsr75}:${jsr179}:${kXml2}:${java.classes.jar}"/>	
+		  <arg line="-classpath ${cldc1.1}:${midp2.0}:${jsr082}:${jsr75}:${jsr179}:${kXml2}:${oracles}:${java.classes.jar}"/>	
 		  <arg line="-d ${preverified}"/>
 		  <arg line="${bin}"/>
 		</exec>

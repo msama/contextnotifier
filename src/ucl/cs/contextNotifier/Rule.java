@@ -160,7 +160,8 @@ public class Rule implements Runnable, Disposable{
     			}*/
     			
     			
-    		}/*else
+    		}
+    		/*else
     		{
     			this._activating=false;
     		}*/
