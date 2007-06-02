@@ -16,8 +16,7 @@
 							Type="Lesser" Value="MyBossOffice" Redifined="true">
 							<tns:Param Name="Latitude"
 								Value="51:31:23.75" />
-							<tns:Param Name="Longitude"
-								Value="7:56.99" />
+							<tns:Param Name="Longitude" Value="7:56.99" />
 							<tns:Param Name="Altitude" Value="20" />
 							<tns:Param Name="Radius" Value="50" />
 						</tns:ConstraintNode>
@@ -29,8 +28,7 @@
 							Type="Lesser" Value="MyOffice" Redifined="true">
 							<tns:Param Name="Latitude"
 								Value="51:31:23.75" />
-							<tns:Param Name="Longitude"
-								Value="7:56.99" />
+							<tns:Param Name="Longitude" Value="7:56.99" />
 							<tns:Param Name="Altitude" Value="20" />
 							<tns:Param Name="Radius" Value="50" />
 						</tns:ConstraintNode>
@@ -41,30 +39,35 @@
 			</tns:NotConstraintNode>
 		</tns:NotificationTree>
 		<tns:ActivationTree>
-			<tns:OrConstraintNode>
-				<tns:ConstraintNode Handler="GPSLocation" Type="Greater"
-					Value="MyBossOffice" Redifined="true">
-					<tns:Param Name="Latitude" Value="51:31:23.75" />
-					<tns:Param Name="Longitude" Value="7:56.99" />
-					<tns:Param Name="Altitude" Value="20" />
-					<tns:Param Name="Radius" Value="5000" />
-				</tns:ConstraintNode>
-				<tns:AndConstraintNode>
-					<tns:ConstraintNode Value="3600000" Type="Greater"
-						Handler="TimeHandler">
-					</tns:ConstraintNode>
+			<tns:AndConstraintNode>
+				<tns:OrConstraintNode>
 					<tns:ConstraintNode Handler="GPSLocation"
 						Type="Greater" Value="MyBossOffice" Redifined="true">
 						<tns:Param Name="Latitude" Value="51:31:23.75" />
 						<tns:Param Name="Longitude" Value="7:56.99" />
 						<tns:Param Name="Altitude" Value="20" />
-						<tns:Param Name="Radius" Value="2500" />
+						<tns:Param Name="Radius" Value="5000" />
 					</tns:ConstraintNode>
-				</tns:AndConstraintNode>
-				<tns:ConstraintNode Value="6900000" Type="Greater"
-					Handler="TimeHandler">
-				</tns:ConstraintNode>
-			</tns:OrConstraintNode>
+					<tns:AndConstraintNode>
+						<tns:ConstraintNode Value="3600000"
+							Type="Greater" Handler="TimeHandler">
+						</tns:ConstraintNode>
+						<tns:ConstraintNode Handler="GPSLocation"
+							Type="Greater" Value="MyBossOffice" Redifined="true">
+							<tns:Param Name="Latitude"
+								Value="51:31:23.75" />
+							<tns:Param Name="Longitude" Value="7:56.99" />
+							<tns:Param Name="Altitude" Value="20" />
+							<tns:Param Name="Radius" Value="2500" />
+						</tns:ConstraintNode>
+					</tns:AndConstraintNode>
+					<tns:ConstraintNode Value="6900000" Type="Greater"
+						Handler="TimeHandler">
+					</tns:ConstraintNode>
+				</tns:OrConstraintNode>
+				<tns:ConstraintNode Value="8700000" Type="Lesser"
+					Handler="TimeHandler"/>
+			</tns:AndConstraintNode>
 		</tns:ActivationTree>
 		<tns:DeactivationTree>
 			<tns:ConstraintNode Value="8700000" Type="Greater"
@@ -88,8 +91,7 @@
 							Type="Lesser" Value="MyBossOffice" Redifined="true">
 							<tns:Param Name="Latitude"
 								Value="51:31:23.75" />
-							<tns:Param Name="Longitude"
-								Value="7:56.99" />
+							<tns:Param Name="Longitude" Value="7:56.99" />
 							<tns:Param Name="Altitude" Value="20" />
 							<tns:Param Name="Radius" Value="50" />
 						</tns:ConstraintNode>
@@ -106,7 +108,7 @@
 			</tns:ConstraintNode>
 		</tns:ActivationTree>
 		<tns:DeactivationTree>
-			<tns:ConstraintNode Value="0" Type="Greater"
+			<tns:ConstraintNode Value="9000000" Type="Greater"
 				Handler="TimeHandler">
 			</tns:ConstraintNode>
 		</tns:DeactivationTree>

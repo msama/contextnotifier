@@ -11,7 +11,6 @@ import javax.microedition.lcdui.Choice;
 
 import ucl.cs.contextNotifier.ConstraintNode;
 import ucl.cs.contextNotifier.ContextHandler;
-import ucl.cs.contextNotifier.ContextHandlerManager;
 import ucl.cs.contextNotifier.Frontend;
 import ucl.cs.contextNotifier.FuzzyLogicBoolean;
 import ucl.cs.contextNotifier.Rule;
@@ -39,6 +38,8 @@ public class TimeHandler extends ContextHandler implements TimerTarget {
 	private TimeHandlerFrontend _frontend=new TimeHandlerFrontend("TimeHandlerFrontend",Choice.IMPLICIT);
 	
 	private Timer _innerTimer=new Timer();
+	
+	private Object _lock=new Object();
 	
 	private Vector _pendingNotification=new Vector();
 	/**
@@ -74,7 +75,7 @@ public class TimeHandler extends ContextHandler implements TimerTarget {
 	/* (non-Javadoc)
 	 * @see ucl.cs.contextNotifier.ContextHandler#updateStatus()
 	 */
-	public void updateStatus() {
+	public synchronized void updateStatus() {
 		for(int i=0;i<this._registeredConstraints.size();i++)
 		{
 			this.validateNode((ConstraintNode)this._registeredConstraints.elementAt(i));
@@ -123,10 +124,7 @@ public class TimeHandler extends ContextHandler implements TimerTarget {
 	public void registerConstraint(ConstraintNode c) {
 		super.registerConstraint(c);
 		this.validateNode(c);
-		long l=Long.parseLong(c.getValue()) + c.getRule().getActivity().getDatetimeLoading() - System.currentTimeMillis();
-		TimeNotification not=new TimeNotification(this,c);
-		this._pendingNotification.addElement(not);
-		this._innerTimer.schedule(not, l);
+		
 		String symbol="";
 		switch(c.getCheckType())
 		{
@@ -161,43 +159,63 @@ public class TimeHandler extends ContextHandler implements TimerTarget {
 				break;
 			}
 		}
-		this._frontend.append(symbol+" "+(new Date(Long.parseLong(c.getValue())+c.getRule().getActivity().getDatetimeLoading()).toString()), null);
+		String label=symbol+" "+(new Date(Long.parseLong(c.getValue())+c.getRule().getActivity().getDatetimeLoading()).toString());
+		
+		long l=Long.parseLong(c.getValue()) + c.getRule().getActivity().getDatetimeLoading() - System.currentTimeMillis();
+		TimeNotification not=new TimeNotification(this,c);
+		
+		
+		synchronized (this._lock) {
+			this._frontend.append(label, null);
+			this._pendingNotification.addElement(not);
+			this._innerTimer.schedule(not, l);
+		}
+		
 		System.out.println("TimeHandler.registerConstraint: "+c.getValue());
+		
 	}
 
-	public void unregisterConstraint(ConstraintNode c) {
+	public synchronized void unregisterConstraint(ConstraintNode c) {
 		super.unregisterConstraint(c);
 		//retrieve TimeNotification
-		for(int i=0;i<this._pendingNotification.size();i++)
-		{
-			TimeNotification not=(TimeNotification)this._pendingNotification.elementAt(i);
-			if(not!=null&&not.getSource().equals(c))
+		//for(int i=0;i<this._pendingNotification.size();i++)
+		
+		synchronized (this._lock) {
+			for(int i=this._pendingNotification.size()-1;i>-1;i--)
 			{
-				//this._innerTimer.removeTimeNotification(not);
-				//java.util.timer does not allow to unschedule tasks
-				this._frontend.delete(i);
-				this._pendingNotification.removeElementAt(i);
-				break;
+				TimeNotification not=(TimeNotification)this._pendingNotification.elementAt(i);
+				if(not!=null&&not.getSource().equals(c))
+				{
+					//this._innerTimer.removeTimeNotification(not);
+					//java.util.timer does not allow to unschedule tasks
+					this._frontend.delete(i);
+					this._pendingNotification.removeElementAt(i);
+					break;
+				}
 			}
 		}
 	}
 
-	public void alert(Object source) {
+	public synchronized void alert(Object source) {
 		ConstraintNode c=(ConstraintNode)source;
 		//remove the notification from the pending array
 		//because java.util.timer does not support unscheduling of events we do it manually.
-		for(int i=0;i<this._pendingNotification.size();i++)
-		{
-			TimeNotification not=(TimeNotification)this._pendingNotification.elementAt(i);
-			if(not.getSource().equals(c))
+		synchronized (this._lock) {
+			for(int i=0;i<this._pendingNotification.size();i++)
 			{
-				//this._innerTimer.removeTimeNotification(not);
-				this.validateNode(c);
-				//this._frontend.delete(i);
-				//this._pendingNotification.removeElementAt(i);
-				break;
+				TimeNotification not=(TimeNotification)this._pendingNotification.elementAt(i);
+				if(not.getSource().equals(c))
+				{
+					//this._innerTimer.removeTimeNotification(not);
+					this.validateNode(c);
+					//this._frontend.delete(i);
+					//this._pendingNotification.removeElementAt(i);
+					break;
+				}
 			}
 		}
+		
+		
 	}
 
 	
