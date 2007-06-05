@@ -16,7 +16,12 @@
 	<property name="signedjarfile" location="${signed}/${ant.project.name}.jar"/>
     <property name="compile.debug" value="true"/>
 	<property name="manifest" location="Manifest"/>
-	
+	<property name="emma.dir" location="/Users/rax/Documents/emma-2.0.5312-lib"/>
+    <property name="emma_jarfile" location="${dist}/emma_${ant.project.name}.jar"/>
+	<property name="emma_jadfile" location="${dist}/emma_${ant.project.name}.jad"/>
+	<property name="emma.enabled" value="true" /> 
+	<property name="out.instr.dir" value="${basedir}/outinstr" /> 
+	<property name="coverage.dir" value="${basedir}/coverage" /> 
 	
 	
   	<!-- Edit the "mpp" property with the path to your installed mpp-sdk. -->
@@ -39,11 +44,24 @@
     <fileset id="lib.jars" dir="${lib}">
         <include name="**/*.jar"/>
     </fileset>
+	
 
     <path id="lib.path">
     	<!--<pathelement location="${j2meunit}"/>-->
     	<pathelement path="${src}/"/>
     </path>
+	
+	<path id="run.classpath" > 
+	      <pathelement location="${preverified}" /> 
+	 </path>
+	
+	<path id="emma.lib"> 
+	    <pathelement location="${emma.dir}/emma.jar" /> 
+	    <pathelement location="${emma.dir}/emma_ant.jar" /> 
+	  </path> 
+	
+	<taskdef resource="emma_ant.properties" classpathref="emma.lib" />
+
 	
     <target name="clean" description="Remove build and dist directories">
         <delete dir="${bin}"/>
@@ -102,6 +120,22 @@
         </jar>
     </target>
 	
+    <target name="jar_emma" depends="jar" description="Build instrumented jar">
+    	<emma enabled="${emma.enabled}" verbosity="verbose" > 
+	      <instr instrpathref="run.classpath" 
+	             destdir="${out.instr.dir}" 
+	             metadatafile="${coverage.dir}/metadata.emma" 
+	             merge="false" 
+	      /> 
+	    </emma> 
+    	<copy file="${ant.project.name}.jad" tofile="${emma_jadfile}" />
+        <jar jarfile="${emma_jarfile}" basedir="${out.instr.dir}" manifest="${manifest}">
+            <!-- Merge library jars into final jar file -->
+            <!--<zipgroupfileset refid="lib.jars"/>-->
+            <fileset dir="${resources}" />
+        </jar>
+    </target>
+	
 	<target name="sign" depends="jar" description="Sign jar file">
 		<mkdir dir="${signed}"/>
 	    <signjar
@@ -114,6 +148,58 @@
         <java jar="${TestingEmulator}" fork="yes" failonerror="true" classpath="${cldc1.1}:${midp2.0}:${jsr082}:${jsr75}:${jsr179}">
 		 	<arg value="${jadfile}"/>
 		</java>
+    </target>
+	
+    <target name="run_emma" depends="jar_emma" description="Run the instrumented jar file">
+    	
+        <java jar="${TestingEmulator}" fork="yes" failonerror="true" classpath="${cldc1.1}:${midp2.0}:${jsr082}:${jsr75}:${jsr179}:emma.lib">
+		 	<arg value="${emma_jadfile}"/>
+        	<jvmarg value="-Demma.coverage.out.file=${coverage.dir}/coverage.emma"/> 
+        	<jvmarg value="-Demma.coverage.out.merge=false" />
+		</java>
+    	
+    	<emma enabled="${emma.enabled}" verbosity="verbose"> 
+    	      <report sourcepath="${src}" > 
+    	        <fileset dir="${coverage.dir}" > 
+    	          <include name="*.emma" /> 
+    	        </fileset> 
+    	        <txt outfile="${coverage.dir}/coverage.txt" /> 
+    	        <html outfile="${coverage.dir}/coverage.html" /> 
+    	      </report> 
+    	   </emma>
+    	
+    	<emma enabled="${emma.enabled}" >
+    	    <report sourcepath="${src}"
+    	          sort="+block,+name,+method,+class"
+    	          metrics="method:70,block:80,line:80,class:100"
+    	    >
+    	    <!-- collect all EMMA data dumps (metadata and runtime)
+    	         [this can be done via nested <fileset> fileset elements
+    	         or <file> elements pointing to a single file]:
+    	    -->
+    	    <fileset dir="${coverage.dir}" >
+    	        <include name="*.emma" />
+    	    </fileset>
+    	    
+    	    <!-- for every type of report desired, configure a nested
+    	         element; various report parameters
+    	         can be inherited from the parent <report>
+    	         and individually overridden for each report type:
+    	    -->
+    	    <txt outfile="${coverage.dir}/coverage.txt"
+    	        depth="package"
+    	        columns="class,method,block,line,name"
+    	    />
+    	    <xml outfile="${coverage.dir}/coverage.xml"
+    	        depth="package"
+    	    />
+    	    <html outfile="${coverage.dir}/coverage.html"
+    	        depth="method"
+    	        columns="name,class,method,block,line"
+    	    />
+    	    </report>
+    	</emma>
+    	
     </target>
 	
     <target name="debug" depends="jar" description="Debug application on the emulator">
@@ -167,8 +253,4 @@
 		</exec>
 	</target>
 	
-    <target name="parallels" depends="jar" description="Copy jar and jad file into the right directory">
-		<copy file="${dist}/${ant.project.name}.jad" tofile="/Users/Rax/ParallelsShared/${ant.project.name}.jad" />
-    	<copy file="${dist}/${ant.project.name}.jar" tofile="/Users/Rax/ParallelsShared/${ant.project.name}.jar" />
-    </target>
 </project>
