@@ -120,7 +120,7 @@
 	</tns:Rule>
 	<tns:Rule Name="Presentation File" OccurrenceMsec="300000">
 		<tns:NotificationTree>
-			<tns:ConstraintNode Value="file://E:/Presentation.ppt"
+			<tns:ConstraintNode Value="file:///E:/Presentation.ppt"
 				Type="NotEquals" Handler="FileSystemHandler" Redifined="false">
 			</tns:ConstraintNode>
 		</tns:NotificationTree>
